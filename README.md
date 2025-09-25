@@ -22,6 +22,8 @@ Este repositorio NO versiona `src/main/resources/application.properties`. En su 
 
 ## Ejecutar con Docker (API + Postgres)
 
+- Siempre ejecutar en la raiz del proyecto y con docker encendido.
+
 1) Build y levantar
 ```bash
 docker compose up --build
