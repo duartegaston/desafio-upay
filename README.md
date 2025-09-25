@@ -40,16 +40,16 @@ docker compose down -v
 ## Endpoints principales
 
 - Collection de Postman: `src/main/docs/postman/desafio-upay.postman_collection.json`
-   - Descargarla y probar facilmente.
+  - Descargarla y probar fácilmente.
 
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON: http://localhost:8080/api-docs
 
 - Auth
-  - `POST /api/v1/auth/signup` (Crar un usuario)
+  - `POST /api/v1/auth/signup` (Crear un usuario)
   - `POST /api/v1/auth/login` (Hacer login para generar un token)
 
-- Calculos
+- Cálculos
   - `POST /api/v1/calculator/sum` (requiere Bearer)
 
 - Auditoría
@@ -59,7 +59,7 @@ docker compose down -v
 
 ```
 src/main/java/com/example/api/
-├─ docs/               # Documentacion
+├─ docs/               # Documentación
 ├─ resources/          # Recursos
 ├── config/           # Seguridad y configuración
 ├── controller/       # REST controllers
@@ -71,6 +71,7 @@ src/main/java/com/example/api/
 ├── security/         # Filtros y servicios JWT
 ├── service/          # Lógica de negocio
 └── SpringBootApiApplication.java
+src/test/java/com/example/api/ # Tests
 ```
 
 - Utilice una estructura de capas Controller, Service y Repository, considerando que se trata de una API pequeña, y es mas facil entenderlo separando bien las responsabilidades.
@@ -83,33 +84,57 @@ src/main/java/com/example/api/
 
 ## Base de datos
 
-- Contendra una tabla para persistir los usuarios y otra tabla para persistir los logs de auditoría.
+- Contendrá una tabla para persistir los usuarios y otra tabla para persistir los logs de auditoría.
 
 ## Kafka
 
 - La API publica eventos de auditoría a un topic de Kafka (audit-events).
 - El consumer persiste los eventos en la base de datos.
-- Agregue un log para poder verificar que se consumio el evento. "[Kafka][AuditEventConsumer] Consumed event: ..."
+- Agregué un log para poder verificar que se consumió el evento. "[Kafka][AuditEventConsumer] Consumed event: ..."
 
-## Metricas
+## Métricas
 
-- Para consultar metricas se utilizó Prometheus.
+- Para consultar métricas se utilizó Prometheus.
   - Endpoint: http://localhost:8080/actuator/prometheus
-  - http_server_requests_seconds_max: maximo tiempo de respuesta
+  - http_server_requests_seconds_max: máximo tiempo de respuesta
   - http_server_requests_seconds: latencia de las peticiones
   - http_server_requests_seconds_count: cantidad de peticiones
 
-## Consideraciones | Deciciones técnicas
+## Unit test
+
+- Se agregaron unit tests para los endpoints principales. Para ejecutarlos: 
+```bash
+mvn test
+```
+- `AuthControllerTest`: 
+  - Test login esperando el token.
+  - Test creación de usuario
+
+- `JwtAuthFilterTest`
+  - Verificamos que se aplique la autenticación.
+  - Si no tenemos username no se aplica la autenticación.
+
+- `AuditLoggingFilterTest`
+  - Verificación de que el productor envía el evento para auditoría.
+  - Si no corresponde el path no se envía el evento para auditoría.
+
+- `JwtServiceTest`
+  - Verificación de que se genere el token y se extraiga el username.
+
+- `AuditServiceTest`
+  - Verificación de que se hace la búsqueda en el repositorio de auditoría con los datos correctos.
+
+## Consideraciones | Decisiones técnicas
 
 - Respecto al desarrollo del endpoint **POST /api/v1/auth/logout**:
-  - El backend no mantiene sessiones ya que los JWT son stateless, por lo que no es necesario implementar logout.
-  - Pienso que deberia ocurrir en el cliente, por ejemplo, limpiar el localStorage o sessionStorage.
-  - Si quisieramos implementar logout, deberiamos mantener un registro de los tokens emitidos y revocarlos cuando el usuario se desloguea.
+  - El backend no mantiene sesiones ya que los JWT son stateless, por lo que no es necesario implementar logout.
+  - Pienso que debería ocurrir en el cliente; por ejemplo, limpiar el localStorage o sessionStorage.
+  - Si quisiéramos implementar logout, deberíamos mantener un registro de los tokens emitidos y revocarlos cuando el usuario se desloguea.
 
-- Para la sección de auditoría agregue la posibilidad de filtrar por distintos campos, ademas de agregar paginación y ordenar de creación descendente. Este flujo decidí no persistirlo como auditoría ya que no es relevante para el negocio.
+- Para la sección de auditoría agregué la posibilidad de filtrar por distintos campos, además de agregar paginación y ordenar por fecha de creación descendente. Este flujo decidí no persistirlo como auditoría ya que no es relevante para el negocio.
 
 - Posibles mejoras:
-   - Si esta arquitectura escalara, utilizaria un sistema de roles para los usuarios. (User, Admin)
+   - Si esta arquitectura escalara, utilizaría un sistema de roles para los usuarios (User, Admin).
    - Agregar logs para detectar errores ya sea por CloudWatch, Kibana o similar.
 
 
@@ -117,8 +142,8 @@ src/main/java/com/example/api/
 
 ### Diagrama de secuencia del Login
 
-![Login](docs/diagrama-secuencia-login.png)
+![Login](src/main/docs/images/diagrama-secuencia-login.png)
 
-### Diagrama de secuencia request autenticada (+ auditoria)
+### Diagrama de secuencia request autenticada (+ auditoría)
 
-![Request autenticada](docs/diagrama-secuencia-request-autenticada.png)
+![Request autenticada](src/main/docs/images/diagrama-secuencia-request-autenticada.png)
