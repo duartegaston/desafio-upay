@@ -1,0 +1,25 @@
+# Maven
+/target/
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+.project
+.classpath
+.settings/
+*.iml
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Environment / secrets
+.env
+.env.local
+
+# Application configs (use example templates instead)
+src/main/resources/application.properties
