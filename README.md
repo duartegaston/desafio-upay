@@ -20,19 +20,6 @@ Este repositorio NO versiona `src/main/resources/application.properties`. En su 
 
 - `src/main/resources/application.properties.example`
 
-Podés configurar la app de dos maneras:
-
-- Opción A (recomendada): variables de entorno (vienen configuradas dentro del docker-compose.yml)
-  - `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/springbootdb`
-  - `SPRING_DATASOURCE_USERNAME=postgres`
-  - `SPRING_DATASOURCE_PASSWORD=postgres`
-  - `APP_JWT_SECRET=<clave_base64_de_32_bytes>` (generá con: `openssl rand -base64 32`)
-  - `APP_JWT_EXPIRATION_MS=3600000`
-
-- Opción B: copiar la plantilla local
-  - `cp src/main/resources/application.properties.example src/main/resources/application.properties`
-  - Editá los valores según tu entorno local.
-
 ## Ejecutar con Docker (API + Postgres)
 
 1) Build y levantar
@@ -72,10 +59,13 @@ docker compose down -v
 
 ```
 src/main/java/com/example/api/
+├─ docs/               # Documentacion
+├─ resources/          # Recursos
 ├── config/           # Seguridad y configuración
 ├── controller/       # REST controllers
 ├── dto/              # Data Transfer Objects
 ├── exception/        # Excepciones personalizadas
+├── kafka/            # Kafka
 ├── model/            # Entidades JPA
 ├── repository/       # Repositorios Spring Data
 ├── security/         # Filtros y servicios JWT
@@ -121,3 +111,14 @@ src/main/java/com/example/api/
 - Posibles mejoras:
    - Si esta arquitectura escalara, utilizaria un sistema de roles para los usuarios. (User, Admin)
    - Agregar logs para detectar errores ya sea por CloudWatch, Kibana o similar.
+
+
+## Diagramas
+
+### Diagrama de secuencia del Login
+
+![Login](docs/diagrama-secuencia-login.png)
+
+### Diagrama de secuencia request autenticada (+ auditoria)
+
+![Request autenticada](docs/diagrama-secuencia-request-autenticada.png)
