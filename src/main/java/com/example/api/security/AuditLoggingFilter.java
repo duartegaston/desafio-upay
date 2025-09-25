@@ -40,13 +40,11 @@ public class AuditLoggingFilter extends OncePerRequestFilter {
                 }
             }
             String path = request.getRequestURI();
-            if (path != null && (
-                    path.startsWith("/api/v1/audit") ||
-                    path.startsWith("/swagger-ui") ||
-                    "/swagger-ui.html".equals(path) ||
-                    path.startsWith("/v3/api-docs") ||
-                    path.startsWith("/api-docs")
-            )) {
+            if (path == null) {
+                return;
+            }
+            boolean auditable = path.startsWith("/api/v1/auth") || path.startsWith("/api/v1/calculator");
+            if (!auditable) {
                 return;
             }
             AuditEvent event = new AuditEvent(

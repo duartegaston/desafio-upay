@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.example.api.security.JwtAuthFilter;
 import com.example.api.security.AuditLoggingFilter;
@@ -23,10 +25,17 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final AuditLoggingFilter auditLoggingFilter;
+    private final AuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final AccessDeniedHandler restAccessDeniedHandler;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, AuditLoggingFilter auditLoggingFilter) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter,
+                          AuditLoggingFilter auditLoggingFilter,
+                          AuthenticationEntryPoint restAuthenticationEntryPoint,
+                          AccessDeniedHandler restAccessDeniedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.auditLoggingFilter = auditLoggingFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
     }
 
     @Bean
@@ -34,13 +43,19 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler)
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/v1/auth/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/api-docs/**",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/actuator/health",
+                    "/actuator/prometheus"
                 ).permitAll()
                 .requestMatchers("/api/v1/audit/**").authenticated()
                 .anyRequest().authenticated()

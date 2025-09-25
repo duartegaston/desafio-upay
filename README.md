@@ -101,6 +101,14 @@ src/main/java/com/example/api/
 - El consumer persiste los eventos en la base de datos.
 - Agregue un log para poder verificar que se consumio el evento. "[Kafka][AuditEventConsumer] Consumed event: ..."
 
+## Metricas
+
+- Para consultar metricas se utilizó Prometheus.
+  - Endpoint: http://localhost:8080/actuator/prometheus
+  - http_server_requests_seconds_max: maximo tiempo de respuesta
+  - http_server_requests_seconds: latencia de las peticiones
+  - http_server_requests_seconds_count: cantidad de peticiones
+
 ## Consideraciones | Deciciones técnicas
 
 - Respecto al desarrollo del endpoint **POST /api/v1/auth/logout**:
