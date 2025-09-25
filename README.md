@@ -74,13 +74,13 @@ src/main/java/com/example/api/
 src/test/java/com/example/api/ # Tests
 ```
 
-- Utilice una estructura de capas Controller, Service y Repository, considerando que se trata de una API pequeña, y es mas facil entenderlo separando bien las responsabilidades.
-- Utilice JPA/Hibernate para definir interfaces y contratos de los repositorios.
-- Utilice Spring Data JPA para implementar los repositorios.
-- Utilice Lombok para simplificar el código.
-- Utilice Spring Security para implementar la seguridad.
-- Utilice Docker compose para levantar la API y la base de datos.
-- Utilice Dockerfile para crear la imagen de la API.
+- Utilicé una estructura de capas Controller, Service y Repository, considerando que se trata de una API pequeña, y es mas facil entenderlo separando bien las responsabilidades.
+- Utilicé JPA/Hibernate para definir interfaces y contratos de los repositorios.
+- Utilicé Spring Data JPA para implementar los repositorios.
+- Utilicé Lombok para simplificar el código.
+- Utilicé Spring Security para implementar la seguridad.
+- Utilicé Docker compose para levantar la API y la base de datos.
+- Utilicé Dockerfile para crear la imagen de la API.
 
 ## Base de datos
 
@@ -96,14 +96,16 @@ src/test/java/com/example/api/ # Tests
 
 - Para consultar métricas se utilizó Prometheus.
   - Endpoint: http://localhost:8080/actuator/prometheus
-  - http_server_requests_seconds_max: máximo tiempo de respuesta
-  - http_server_requests_seconds: latencia de las peticiones
-  - http_server_requests_seconds_count: cantidad de peticiones
+  - `http_server_requests_seconds_max`: máximo tiempo de respuesta
+  - `http_server_requests_seconds`: latencia de las peticiones
+  - `http_server_requests_seconds_count`: cantidad de peticiones
 
 ## Unit test
 
 - Se agregaron unit tests para los endpoints principales. Para ejecutarlos: 
 ```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+mvn -q -DskipTests=false test
 mvn test
 ```
 - `AuthControllerTest`: 
@@ -131,10 +133,10 @@ mvn test
   - Pienso que debería ocurrir en el cliente; por ejemplo, limpiar el localStorage o sessionStorage.
   - Si quisiéramos implementar logout, deberíamos mantener un registro de los tokens emitidos y revocarlos cuando el usuario se desloguea.
 
-- Para la sección de auditoría agregué la posibilidad de filtrar por distintos campos, además de agregar paginación y ordenar por fecha de creación descendente. Este flujo decidí no persistirlo como auditoría ya que no es relevante para el negocio.
+- Para la sección de auditoría agregué la posibilidad de filtrar por distintos campos, además de agregar paginación y ordenar por fecha de creación descendente. Este flujo decidí no persistirlo como auditoría ya que no es relevante para el negocio. Los unicos endpoints que se van a auditar son los de autenticación y los de cálculos.
 
 - Posibles mejoras:
-   - Si esta arquitectura escalara, utilizaría un sistema de roles para los usuarios (User, Admin).
+   - Si esta arquitectura escalara, utilizaría un sistema de roles para los usuarios para mayor seguridad y controlar acceso a los endpoints. (User, Admin).
    - Agregar logs para detectar errores ya sea por CloudWatch, Kibana o similar.
 
 
