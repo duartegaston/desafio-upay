@@ -23,3 +23,7 @@ logs/
 
 # Application configs (use example templates instead)
 src/main/resources/application.properties
+
+# VSCode
+.vscode
+
