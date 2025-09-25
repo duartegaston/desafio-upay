@@ -10,13 +10,19 @@ Aplicación Spring Boot con JPA, Security y PostgreSQL.
 
 ## Configuración
 
+- Antes que nada clonar el repositorio
+
+```bash
+git clone https://github.com/duartegaston/desafio-upay.git
+```
+
 Este repositorio NO versiona `src/main/resources/application.properties`. En su lugar incluye una plantilla por si queremos levantar localmente:
 
 - `src/main/resources/application.properties.example`
 
 Podés configurar la app de dos maneras:
 
-- Opción A (recomendada): variables de entorno
+- Opción A (recomendada): variables de entorno (vienen configuradas dentro del docker-compose.yml)
   - `SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/springbootdb`
   - `SPRING_DATASOURCE_USERNAME=postgres`
   - `SPRING_DATASOURCE_PASSWORD=postgres`
@@ -46,6 +52,9 @@ docker compose down -v
 
 ## Endpoints principales
 
+- Collection de Postman: `src/main/docs/postman/desafio-upay.postman_collection.json`
+   - Descargarla y probar facilmente.
+
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - OpenAPI JSON: http://localhost:8080/api-docs
 
@@ -53,13 +62,11 @@ docker compose down -v
   - `POST /api/v1/auth/signup` (Crar un usuario)
   - `POST /api/v1/auth/login` (Hacer login para generar un token)
 
-- Ejemplo protegido
+- Calculos
   - `POST /api/v1/calculator/sum` (requiere Bearer)
 
 - Auditoría
   - `GET /api/v1/audit/history` (requiere Bearer)
-
-- Ademas dentro de la carpeta de docs se encuentra una collection de Postman para descargarla y probar facilmente.
 
 ## Estructura del proyecto
 
@@ -84,6 +91,15 @@ src/main/java/com/example/api/
 - Utilice Docker compose para levantar la API y la base de datos.
 - Utilice Dockerfile para crear la imagen de la API.
 
+## Base de datos
+
+- Contendra una tabla para persistir los usuarios y otra tabla para persistir los logs de auditoría.
+
+## Kafka
+
+- La API publica eventos de auditoría a un topic de Kafka (audit-events).
+- El consumer persiste los eventos en la base de datos.
+- Agregue un log para poder verificar que se consumio el evento. "[Kafka][AuditEventConsumer] Consumed event: ..."
 
 ## Consideraciones | Deciciones técnicas
 
@@ -97,7 +113,3 @@ src/main/java/com/example/api/
 - Posibles mejoras:
    - Si esta arquitectura escalara, utilizaria un sistema de roles para los usuarios. (User, Admin)
    - Agregar logs para detectar errores ya sea por CloudWatch, Kibana o similar.
-
-## Base de datos
-
-- Contendra una tabla para persistir los usuarios y otra tabla para persistir los logs de auditoría.

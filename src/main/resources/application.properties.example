@@ -35,3 +35,8 @@ app.jwt.secret=${APP_JWT_SECRET:ZmFrZV9kZWNvZGVkX2Jhc2U2NF9zZWNyZXRfa2V5X3RvX2No
 app.jwt.expiration-ms=${APP_JWT_EXPIRATION_MS:3600000}
 
 # Nota: En Docker Compose, estas propiedades se sobreescriben vía variables de entorno.
+
+# Kafka (Auditoría asíncrona)
+spring.kafka.bootstrap-servers=${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+app.audit.topic=${APP_AUDIT_TOPIC:audit-events}
+spring.kafka.consumer.auto-offset-reset=earliest

@@ -1,7 +1,7 @@
 package com.example.api.security;
 
-import com.example.api.model.AuditLog;
-import com.example.api.repository.AuditLogRepository;
+import com.example.api.kafka.AuditEvent;
+import com.example.api.kafka.AuditEventProducer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,14 +12,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 
 @Component
 public class AuditLoggingFilter extends OncePerRequestFilter {
 
-    private final AuditLogRepository auditLogRepository;
+    private final AuditEventProducer producer;
 
-    public AuditLoggingFilter(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
+    public AuditLoggingFilter(AuditEventProducer producer) {
+        this.producer = producer;
     }
 
     @Override
@@ -28,7 +29,6 @@ public class AuditLoggingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } finally {
-            // Prefer username explicitly provided by controller (e.g., on signup/login)
             String username = null;
             Object auditUsernameAttr = request.getAttribute("auditUsername");
             if (auditUsernameAttr instanceof String s && !s.isBlank()) {
@@ -40,16 +40,23 @@ public class AuditLoggingFilter extends OncePerRequestFilter {
                 }
             }
             String path = request.getRequestURI();
-            if (path != null && path.startsWith("/api/v1/audit")) {
+            if (path != null && (
+                    path.startsWith("/api/v1/audit") ||
+                    path.startsWith("/swagger-ui") ||
+                    "/swagger-ui.html".equals(path) ||
+                    path.startsWith("/v3/api-docs") ||
+                    path.startsWith("/api-docs")
+            )) {
                 return;
             }
-            AuditLog logEntry = AuditLog.builder()
-                    .method(request.getMethod())
-                    .path(path)
-                    .username(username)
-                    .status(String.valueOf(response.getStatus()))
-                    .build();
-            auditLogRepository.save(logEntry);
+            AuditEvent event = new AuditEvent(
+                    request.getMethod(),
+                    path,
+                    username,
+                    String.valueOf(response.getStatus()),
+                    Instant.now()
+            );
+            producer.send(event);
         }
     }
 }
